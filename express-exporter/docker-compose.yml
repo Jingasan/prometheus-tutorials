@@ -1,0 +1,29 @@
+version: "3"
+services:
+  prometheus:
+    container_name: prometheus-server
+    image: prom/prometheus:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/data:/prometheus
+    user: root
+    restart: always
+  grafana:
+    container_name: grafana-server
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+    user: root
+    restart: always
+  express-exporter:
+    container_name: express-exporter
+    image: express-exporter:latest
+    build:
+      context: ./express
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"

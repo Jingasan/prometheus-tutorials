@@ -1,0 +1,27 @@
+# Prometheusのグローバル設定
+global:
+  scrape_interval: 15s # メトリクスデータの収集間隔 (default: 15s)
+  scrape_timeout: 10s # メトリクスデータ収集のタイムアウト値
+  evaluation_interval: 15s # 監視ルールの評価間隔
+  external_labels:
+    monitor: "codelab-monitor" # Alert Managerの名前
+
+# # 監視ルールファイルの指定
+# rule_files:
+#   - /etc/prometheus/alert.rules
+
+# # AlertManagerの設定
+# alerting:
+#   alertmanagers:
+#     - scheme: http
+#       static_configs:
+#         - targets:
+#          # AlertManagerのIPアドレス/Host名:Port番号
+#          - alertmanager:9093
+
+# メトリクスデータ収集対象サーバーの設定
+scrape_configs:
+  - job_name: "node" # ジョブ名
+    scrape_interval: 5s # メトリクスデータの収集間隔(global値を上書き)
+    static_configs:
+      - targets: ["node-exporter:9100"] # サーバーのIPとポート番号
