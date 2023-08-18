@@ -16,7 +16,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./grafana:/var/lib/grafana
+      - ./grafana/data:/var/lib/grafana
     user: root
     restart: always
   node-exporter:
