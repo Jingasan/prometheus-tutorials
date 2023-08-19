@@ -1,0 +1,12 @@
+apiVersion: 1
+providers:
+  - name: "nginx" # ダッシュボードの名前
+    orgId: 1
+    folder: "Service" # ダッシュボードが格納されるフォルダ名
+    type: file
+    disableDeletion: false # ダッシュボードの削除可否
+    updateIntervalSeconds: 10 # ダッシュボードの更新頻度[sec]
+    allowUiUpdates: false # UI変更の可否
+    options:
+      path: /var/lib/grafana/dashboards/nginx.json # ダッシュボードのJSONファイルパス
+      foldersFromFilesStructure: false
