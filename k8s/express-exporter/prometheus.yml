@@ -45,19 +45,22 @@ spec:
               memory: 256Mi
               cpu: "0.2"
           volumeMounts:
+            # Prometheusの設定ファイルのマウント
             - name: prometheus-config
               mountPath: /etc/prometheus
               readOnly: true
+            # Prometheusで収集するメトリクスデータの保存領域のマウント
             - name: localvolume
               mountPath: /prometheus
-      # 定義したConfigMapをvolumesとして宣言
       volumes:
+        # Prometheusの設定ファイルのConfigMap
         - name: prometheus-config
           configMap:
             name: prometheus-config
             items:
               - key: prometheus.yml
                 path: prometheus.yml
+        # メトリクスデータの永続化用のボリューム
         - name: localvolume
           persistentVolumeClaim:
             claimName: dynamic-provisioning-claim
@@ -68,7 +71,7 @@ kind: ConfigMap
 metadata:
   name: prometheus-config
 data:
-  # prometheusの設定
+  # Prometheusの設定
   prometheus.yml: |
     # Prometheusのグローバル設定
     global:
