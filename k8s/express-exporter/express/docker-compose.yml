@@ -1,0 +1,10 @@
+version: "3"
+services:
+  express-exporter:
+    container_name: express-exporter
+    image: express-exporter:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"

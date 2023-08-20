@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: express-exporter
+  name: express-exporter
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 4000
+      targetPort: 4000
+      protocol: TCP
+  selector:
+    app: express-exporter
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: express-exporter
+  name: express-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: express-exporter
+  template:
+    metadata:
+      name: express-exporter
+      labels:
+        app: express-exporter
+    spec:
+      containers:
+        - name: express-exporter
+          image: express-exporter:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 4000
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"

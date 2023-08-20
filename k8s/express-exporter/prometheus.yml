@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    app: prometheus
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  serviceName: prometheus
+  template:
+    metadata:
+      name: prometheus
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          ports:
+            - containerPort: 9090
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+              readOnly: true
+            - name: localvolume
+              mountPath: /prometheus
+      # 定義したConfigMapをvolumesとして宣言
+      volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
+            items:
+              - key: prometheus.yml
+                path: prometheus.yml
+        - name: localvolume
+          persistentVolumeClaim:
+            claimName: dynamic-provisioning-claim
+      terminationGracePeriodSeconds: 0
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  # prometheusの設定
+  prometheus.yml: |
+    # Prometheusのグローバル設定
+    global:
+      scrape_interval: 15s # メトリクスデータの収集間隔 (default: 15s)
+      scrape_timeout: 10s # メトリクスデータ収集のタイムアウト値
+      evaluation_interval: 15s # 監視ルールの評価間隔
+    # メトリクスデータ収集対象サーバーの設定
+    scrape_configs:
+      - job_name: "express" # ジョブ名
+        scrape_interval: 5s # メトリクスデータの収集間隔(global値を上書き)
+        static_configs:
+          - targets: ["express-exporter:4000"] # サーバーのIPとポート番号
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dynamic-provisioning-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
